@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Là Triệu Phú – Trung Thu</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+  :root{--navy:#101B3D;--navy2:#17275a;--red:#8F1D2C;--gold:#D4AF37;--ivory:#F6EEDB;--ink:#0b1128;--green:#1f9d68;--danger:#d94b54}
+  *{box-sizing:border-box}
+  .hidden{display:none!important}
+  body{margin:0;font-family:"Work Sans",sans-serif;color:var(--ivory);overflow-x:hidden;background:radial-gradient(circle at 50% 12%,#304d94 0%,#17275a 25%,#101B3D 63%,#070d21 100%)}
+  .game-root{width:100%;min-height:100vh;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 12%,#304d94 0%,#17275a 25%,#101B3D 63%,#070d21 100%)}
+  .sky-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.13;mix-blend-mode:screen;pointer-events:none}
+  .stars{position:absolute;inset:0;opacity:.48;background-image:radial-gradient(#fff 1px,transparent 1.4px),radial-gradient(#d4af37 1px,transparent 1.2px);background-size:72px 72px,113px 113px;background-position:0 0,32px 48px;pointer-events:none}
+  .moon{position:absolute;width:clamp(130px,17vw,250px);aspect-ratio:1;border-radius:50%;top:-44px;right:8%;background:radial-gradient(circle at 37% 33%,#fffdf0 0 4%,#f7dc8e 28%,#d4af37 63%,#b6811c 100%);box-shadow:0 0 35px 8px rgba(255,225,142,.52),0 0 120px 25px rgba(212,175,55,.22);opacity:.88}
+  .moon:after{content:"";position:absolute;inset:15%;border-radius:50%;background:radial-gradient(circle at 65% 35%,rgba(144,99,26,.18) 0 9%,transparent 10%),radial-gradient(circle at 32% 65%,rgba(144,99,26,.15) 0 10%,transparent 11%)}
+  .cloud{position:absolute;width:280px;height:45px;background:rgba(246,238,219,.12);filter:blur(2px);border-radius:999px}.cloud:before,.cloud:after{content:"";position:absolute;border-radius:50%;background:inherit}.cloud:before{width:88px;height:88px;bottom:-3px;left:45px}.cloud:after{width:110px;height:110px;bottom:-12px;left:118px}.cloud.one{top:19%;left:-80px}.cloud.two{top:37%;right:-70px;transform:scale(.7)}
+  .lantern{position:absolute;top:0;width:48px;height:72px;border:2px solid #f2ce69;border-radius:48% 48% 42% 42%;background:linear-gradient(90deg,#6c101d,#bd3541 45%,#8f1d2c);box-shadow:0 0 20px rgba(212,175,55,.65);animation:sway 4s ease-in-out infinite}.lantern:before{content:"";position:absolute;left:50%;top:0;width:1px;height:66px;background:#d4af37;transform:translateY(-64px)}.lantern:after{content:"";position:absolute;left:50%;bottom:-28px;width:2px;height:27px;background:#d4af37}.lantern.l1{left:7%;animation-delay:-1s}.lantern.l2{right:10%;transform:scale(.72);animation-delay:-2s}.lantern.l3{right:28%;transform:scale(.48);animation-delay:-.5s}
+  .roofline{position:absolute;bottom:0;left:0;right:0;height:105px;background:#070b1b;clip-path:polygon(0 68%,5% 40%,10% 68%,16% 68%,21% 25%,27% 68%,34% 68%,40% 42%,46% 68%,56% 68%,62% 20%,68% 68%,75% 68%,82% 38%,88% 68%,100% 68%,100% 100%,0 100%);opacity:.95;pointer-events:none}
+  .screen{display:none;position:relative;z-index:2;width:100%;min-height:100vh;padding:clamp(20px,3vw,44px)}.screen.active{display:flex;animation:reveal .45s ease both}@keyframes reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .panel{background:linear-gradient(135deg,rgba(18,32,75,.88),rgba(9,16,42,.91));border:1px solid rgba(212,175,55,.58);box-shadow:0 22px 60px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.13);backdrop-filter:blur(11px)}
+  .gold-line{height:1px;background:linear-gradient(90deg,transparent,#d4af37,transparent)}
+  .serif{font-family:"Fraunces",serif}.gold-text{color:var(--gold);text-shadow:0 2px 18px rgba(212,175,55,.35)}
+  .form-field{width:100%;padding:14px 16px;border:1px solid rgba(212,175,55,.55);border-radius:12px;background:rgba(246,238,219,.08);color:var(--ivory);outline:none;transition:.2s;font-size:16px}.form-field::placeholder{color:rgba(246,238,219,.53)}.form-field:focus{border-color:#f3d66c;box-shadow:0 0 0 3px rgba(212,175,55,.22)}
+  .game-btn{border:1px solid #e5c563;border-radius:12px;background:linear-gradient(135deg,#b7861f,#e3c356,#9d7117);color:#171026;font-weight:800;letter-spacing:.06em;transition:.2s;box-shadow:0 8px 24px rgba(212,175,55,.2);font-size:16px}.game-btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.1)}.game-btn:disabled{opacity:.6;cursor:wait}
+  .game-btn:focus-visible,.answer-btn:focus-visible,.help-btn:focus-visible,.sound-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+  .quiz-layout{width:100%;max-width:1440px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:22px;align-items:start}
+  .quiz-header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:13px 17px;border-radius:16px}
+  .metric{font-size:.76rem;letter-spacing:.08em;font-weight:800;color:#f6eedb}.metric strong{color:#fff;font-size:1.05rem}.timer{min-width:70px;text-align:center}.timer.warn{color:#ffcc72}.timer.critical{color:#ff676f;animation:pulse .65s infinite}.timer strong{font-size:1.42rem}
+  .progress-dots{display:flex;gap:7px;justify-content:center;padding:13px}.dot{width:13px;height:13px;border-radius:50%;border:1px solid #d4af37;background:transparent}.dot.done{background:#d4af37;box-shadow:0 0 8px #d4af37}.dot.current{background:#fff0a5;box-shadow:0 0 15px 4px rgba(212,175,55,.65);transform:scale(1.2)}
+  .question-card{padding:clamp(19px,3vw,36px);border-radius:22px;min-height:300px}.question-tag{font-size:.73rem;letter-spacing:.21em;color:#e9c866;font-weight:800}.question-text{font-family:"Fraunces",serif;font-size:clamp(1.2rem,2.15vw,1.85rem);line-height:1.42;font-weight:600;color:#fff9e8;margin:14px 0 24px}
+  .answers{display:grid;grid-template-columns:1fr 1fr;gap:14px}.answer-btn{min-height:74px;text-align:left;padding:15px 17px;border:1px solid rgba(212,175,55,.48);border-radius:13px;background:rgba(246,238,219,.07);color:#fff9e8;font-weight:600;transition:.2s}.answer-btn:hover:not(:disabled){background:rgba(212,175,55,.16);border-color:#f3d66c;transform:translateY(-2px)}.answer-btn:disabled{cursor:default}.answer-btn.selected{border-color:#f3d66c;background:rgba(212,175,55,.27)}.answer-btn.correct{border-color:#65e0a2;background:rgba(31,157,104,.36)}.answer-btn.wrong{border-color:#ff6f79;background:rgba(217,75,84,.34);animation:shake .36s}.answer-key{display:inline-flex;width:28px;height:28px;margin-right:10px;align-items:center;justify-content:center;border-radius:50%;background:rgba(212,175,55,.2);color:#f3d66c;font-weight:800}
+  .feedback{margin-top:18px;min-height:42px;padding:13px 15px;border-radius:11px;line-height:1.45}.feedback.good{background:rgba(31,157,104,.22);border-left:3px solid #65e0a2}.feedback.bad{background:rgba(217,75,84,.21);border-left:3px solid #ff6f79}
+  .help-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:17px}.help-btn{padding:10px 15px;border:1px solid rgba(212,175,55,.55);border-radius:10px;background:rgba(15,25,58,.65);color:#f6eedb;font-size:.82rem;font-weight:800;transition:.2s}.help-btn:not(:disabled):hover{background:rgba(212,175,55,.17)}.help-btn:disabled{opacity:.56;cursor:not-allowed}
+  .ladder{border-radius:17px;padding:15px}.ladder h2{font-size:.76rem;letter-spacing:.12em;color:#d4af37;text-align:center;font-weight:800;margin:0 0 10px}.ladder-item{display:flex;justify-content:space-between;padding:8px 10px;border-radius:7px;color:#d5d8e5;font-size:.86rem}.ladder-item.active{color:#101B3D;background:linear-gradient(90deg,#ba912f,#f3d66c);font-weight:800;box-shadow:0 0 17px rgba(212,175,55,.44)}
+  .sound-btn{border:1px solid rgba(212,175,55,.6);background:rgba(10,17,42,.6);color:#f6eedb;border-radius:9px;padding:8px 10px}
+  .modal{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(3,7,20,.69);backdrop-filter:blur(6px)}.modal.show{display:flex}.modal-card{width:min(480px,100%);text-align:center;padding:34px;border-radius:20px}.modal-card p{color:#ece2c8;line-height:1.6}
+  .result-card{width:min(810px,100%);margin:auto;padding:clamp(25px,4vw,48px);border-radius:24px;text-align:center}.result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:24px 0}.result-stat{padding:14px;border:1px solid rgba(212,175,55,.32);border-radius:12px;background:rgba(246,238,219,.055);font-size:.87rem;color:#dfe1ea}.result-stat strong{display:block;margin-top:4px;color:#fff8df;font-size:1.2rem}
+  .shot-banner{margin:18px 0 6px;padding:14px 16px;border-radius:14px;border:2px dashed #f3d66c;background:rgba(212,175,55,.14);color:#fff4c8;font-weight:800;letter-spacing:.03em;animation:glow 1.6s ease-in-out infinite}
+  .shot-banner small{display:block;font-weight:500;letter-spacing:0;color:#ece2c8;margin-top:4px}
+  .demo-warn{position:fixed;left:0;right:0;top:0;z-index:20;background:#8F1D2C;color:#fff;text-align:center;font-size:13px;padding:6px 10px;font-weight:600}
+  .admin-table{width:100%;border-collapse:collapse;font-size:.9rem}.admin-table th,.admin-table td{padding:9px 10px;border-bottom:1px solid rgba(212,175,55,.22);text-align:left}.admin-table th{color:#d4af37;font-size:.74rem;letter-spacing:.08em}.admin-table td.num,.admin-table th.num{text-align:right}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.72rem;font-weight:700}.tag.done{background:rgba(31,157,104,.3);color:#9ff0c6}.tag.playing{background:rgba(212,175,55,.25);color:#f3d66c}.tag.none{background:rgba(246,238,219,.1);color:#bbb}
+  @keyframes sway{50%{transform:rotate(4deg)}}@keyframes pulse{50%{transform:scale(1.1)}}@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}@keyframes glow{50%{box-shadow:0 0 22px rgba(243,214,108,.55)}}
+  @media(max-width:850px){.quiz-layout{grid-template-columns:1fr}.ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.ladder h2{grid-column:1/-1}.ladder-item{font-size:.68rem;padding:6px;display:block;text-align:center}.lantern.l3{display:none}}
+  @media(max-width:620px){.screen{padding:16px}.answers{grid-template-columns:1fr}.quiz-header{justify-content:center}.metric{font-size:.66rem}.question-card{padding:18px}.result-grid{grid-template-columns:1fr}.moon{right:-30px}.lantern.l2{display:none}.admin-table{font-size:.78rem}.admin-table .hide-sm{display:none}}
+</style>
+</head>
+<body>
+<div id="demoWarn" class="demo-warn" hidden>⚠ CHẾ ĐỘ THỬ: chưa cấu hình Firebase — dữ liệu chỉ lưu trên trình duyệt này. Điền FIREBASE_CONFIG trong file trước khi dùng thật.</div>
+<div class="game-root">
+  <img class="sky-photo" loading="lazy" src="https://images.pexels.com/photos/35233635/pexels-photo-35233635.jpeg" alt="" onerror="this.remove()">
+  <div class="stars"></div><div class="moon" aria-hidden="true"></div>
+  <div class="cloud one" aria-hidden="true"></div><div class="cloud two" aria-hidden="true"></div>
+  <div class="lantern l1" aria-hidden="true"></div><div class="lantern l2" aria-hidden="true"></div><div class="lantern l3" aria-hidden="true"></div>
+  <div class="roofline" aria-hidden="true"></div>
+  <main>
+    <!-- START -->
+    <section id="startScreen" class="screen active items-center justify-center" aria-labelledby="startTitle">
+      <div class="panel w-full max-w-xl rounded-3xl p-7 sm:p-10 text-center">
+        <div class="text-5xl mb-3" aria-hidden="true">🎑</div>
+        <p class="gold-text font-bold" style="font-size:16px;letter-spacing:.12rem">🎑 GAMESHOW NỘI BỘ 🎑</p>
+        <h1 id="startTitle" class="serif font-extrabold mt-2" style="color:#F6EEDB;font-size:40px;line-height:1.1">AI LÀ TRIỆU PHÚ<br>TRUNG THU</h1>
+        <div class="gold-line my-5"></div>
+        <p class="mb-7" style="font-weight:700;font-size:16px;letter-spacing:.08rem">THỬ THÁCH KIẾN THỨC TRUNG THU</p>
+        <form id="startForm" class="text-left space-y-4" novalidate>
+          <div>
+            <label class="block mb-2 font-bold" for="nameInput" style="font-size:16px;letter-spacing:.08rem">HỌ VÀ TÊN</label>
+            <input id="nameInput" class="form-field" type="text" autocomplete="off" placeholder="Nhập đầy đủ họ tên có dấu" aria-required="true">
+          </div>
+          <div>
+            <label class="block mb-2 font-bold" for="deptInput" style="font-size:16px;letter-spacing:.08rem">PHÒNG BAN</label>
+            <input id="deptInput" class="form-field" type="text" autocomplete="off" placeholder="Nhập phòng ban" aria-required="true">
+          </div>
+          <p id="formMessage" class="hidden text-sm text-red-200" role="alert"></p>
+          <button id="startButton" class="game-btn w-full py-4 mt-2" type="submit">▶ BẮT ĐẦU</button>
+          <p class="text-xs text-center" style="color:#cfc4a4">Mỗi người chỉ được chơi <b>01 lần</b>. Khi bấm BẮT ĐẦU, lượt chơi của bạn được ghi nhận.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quizScreen" class="screen" aria-label="Màn hình câu hỏi">
+      <div class="quiz-layout">
+        <div class="min-w-0">
+          <header class="quiz-header panel">
+            <div class="metric" id="questionMetric">CÂU <strong>01 / 10</strong></div>
+            <div class="metric">🏆 ĐIỂM: <strong id="scoreMetric">0</strong></div>
+            <div id="timerMetric" class="metric timer">⏱ <strong id="timerValue">30</strong></div>
+            <div class="metric max-w-[180px] truncate" id="playerMetric"></div>
+            <button id="soundButton" class="sound-btn" type="button" aria-label="Bật hoặc tắt âm thanh">🔊</button>
+          </header>
+          <div id="progressDots" class="progress-dots" aria-label="Tiến độ câu hỏi"></div>
+          <article class="question-card panel">
+            <p class="question-tag" id="questionTag">CÂU HỎI</p>
+            <h1 id="questionText" class="question-text"></h1>
+            <div id="answers" class="answers" aria-label="Các lựa chọn đáp án"></div>
+            <div id="feedback" class="feedback hidden" role="status" aria-live="polite"></div>
+            <div class="text-center mt-4"><button id="nextButton" class="game-btn px-8 py-3 hidden" type="button">CÂU TIẾP THEO ▶</button></div>
+          </article>
+          <div class="help-row" aria-label="Quyền trợ giúp">
+            <button id="fiftyButton" class="help-btn" type="button"></button>
+            <button id="switchButton" class="help-btn" type="button"></button>
+          </div>
+          <p id="helpHint" class="text-center text-xs mt-3" style="color:#d5c79c;min-height:1.25rem"></p>
+        </div>
+        <aside class="ladder panel" aria-label="Thang điểm"><h2>THANG ĐIỂM</h2><div id="ladderItems"></div></aside>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section id="resultScreen" class="screen items-center justify-center" aria-labelledby="resultTitle">
+      <div class="result-card panel">
+        <h1 id="resultTitle" class="serif font-extrabold" style="color:#F6EEDB;font-size:36px">🎑 KẾT QUẢ 🎑</h1>
+        <div class="shot-banner">📸 VUI LÒNG CHỤP MÀN HÌNH KẾT QUẢ NÀY<small>và gửi cho Ban tổ chức để đối chiếu. Đừng bấm nút bên dưới trước khi chụp.</small></div>
+        <div class="gold-line my-5"></div>
+        <div class="flex justify-center gap-8 text-left text-sm flex-wrap">
+          <div><span style="display:block;color:#D4AF37;font-weight:700;font-size:16px">HỌ VÀ TÊN</span><strong id="resultName" class="block mt-1"></strong></div>
+          <div><span style="display:block;color:#D4AF37;font-weight:700;font-size:16px">PHÒNG BAN</span><strong id="resultDepartment" class="block mt-1"></strong></div>
+        </div>
+        <h2 id="resultMessage" class="serif text-2xl mt-7" style="color:#fff4c8"></h2>
+        <p id="resultDescription" class="mt-2" style="color:#ded8c5"></p>
+        <div id="resultGrid" class="result-grid"></div>
+        <p id="resultStamp" class="text-xs mb-2" style="color:#cfc4a4"></p>
+        <p id="saveStatus" class="text-sm mb-5"></p>
+        <button id="restartButton" class="game-btn px-8 py-4" type="button">👤 NGƯỜI CHƠI TIẾP THEO</button>
+      </div>
+    </section>
+
+    <!-- ADMIN (?admin=1) -->
+    <section id="adminScreen" class="screen justify-center" aria-labelledby="adminTitle">
+      <div class="panel w-full max-w-5xl rounded-3xl p-6 sm:p-8" style="height:fit-content">
+        <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+          <h1 id="adminTitle" class="serif gold-text text-2xl font-bold">🏆 BẢNG XẾP HẠNG – TRUNG THU</h1>
+          <button id="adminRefresh" class="game-btn px-5 py-2" type="button">↻ TẢI LẠI</button>
+        </div>
+        <p id="adminInfo" class="text-sm mb-3" style="color:#cfc4a4"></p>
+        <div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>#</th><th>HỌ TÊN</th><th class="hide-sm">PHÒNG BAN</th><th>TRẠNG THÁI</th><th class="num">ĐIỂM</th><th class="num">ĐÚNG</th><th class="num">THỜI GIAN</th></tr></thead><tbody id="adminBody"></tbody></table></div>
+        <p class="text-xs mt-4" style="color:#a9a08a">Xếp hạng: điểm cao hơn trước, bằng điểm thì thời gian ít hơn đứng trước. Muốn cho một người chơi lại: xoá document của người đó trong Firebase Console.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="unlockModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="unlockTitle">
+    <div class="modal-card panel">
+      <div class="text-4xl mb-3">🎉</div>
+      <h2 id="unlockTitle" class="serif gold-text font-bold" style="font-size:28px">CHÚC MỪNG!</h2>
+      <p class="my-4">Bạn đã mở khóa 2 quyền trợ giúp!<br><small>Dùng được từ câu 4 đến câu 8, mỗi quyền 1 lần.</small></p>
+      <div class="flex justify-center gap-3 text-sm font-bold mb-6"><span>🌓 50:50</span><span>🔄 ĐỔI CÂU</span></div>
+      <button id="unlockClose" class="game-btn px-6 py-3" type="button">TIẾP TỤC CÂU 4 ▶</button>
+    </div>
+  </div>
+  <div id="finalModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="finalTitle">
+    <div class="modal-card panel">
+      <div class="text-4xl mb-3">🔒</div>
+      <h2 id="finalTitle" class="serif gold-text font-bold" style="font-size:28px">VÒNG CHUNG KẾT</h2>
+      <p class="my-4">Bạn đang bước vào vòng chung kết.<br>TRỢ GIÚP ĐÃ ĐÓNG ở câu 9 và câu 10.</p>
+      <button id="finalClose" class="game-btn px-6 py-3" type="button">BẮT ĐẦU CÂU 9 ▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   1) CẤU HÌNH FIREBASE (Cloud Firestore)
+   Lấy ở: Firebase Console → Project settings → General → Your apps (Web)
+   Chỉ cần apiKey và projectId. Để trống = chế độ thử (lưu trên trình duyệt).
+   ===================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey:    "AIzaSyBM702kTcvP4kGb9iIeSmS4qeGMajouB3o",
+  projectId: "content-planner-vps"
+};
+const COLLECTION = "trungthu_2026";
+
+/* 2) DANH SÁCH NGƯỜI CHƠI HỢP LỆ */
+const PLAYERS = [
+  "Lê Hồng Hà","Nguyễn Thị Tuyết Trinh","Nguyễn Hoàng Tuyết Khanh","La Thúy Huyền Trân",
+  "Phan Thị Bích Phượng","Nguyễn Hoàng Vinh","Nguyễn Đăng Khoa","Nguyễn Ngọc Tường Vân",
+  "Bùi Thị Mai Hương","Hoàng Vĩnh Phúc","Võ Đại Lộc","Đặng Ngọc Lan",
+  "Đỗ Thị Ngọc Liên","Phạm Thị Kiều Trinh","Phạm Thị Thảo Hương","Lê Đông Hồ",
+  "Khoa Test"
+];
+
+/* 3) CÂU HỎI (giữ nguyên nội dung gốc) */
+const quizQuestions = [
+  {points:100,question:'Nếu “Trung Thu” nghĩa là “giữa mùa thu”, vậy “Trung Thu” rơi vào tháng nào theo cách tính mùa truyền thống?',options:{A:'Tháng 7',B:'Tháng 8',C:'Tháng 9',D:'Tháng 10'},correctAnswer:'B',explanation:'Mẹo nằm ngay trong tên: Trung = giữa, Thu = mùa thu. Theo cách chia mùa truyền thống, tháng 7–8–9 thuộc mùa thu → tháng 8 là giữa mùa thu.'},
+  {points:100,question:'Tên gọi nào dưới đây nghe có vẻ “rất Trung Thu”, nhưng thực ra KHÔNG phải cách gọi của Tết Trung Thu?',options:{A:'Tết Đoàn Viên',B:'Tết Trông Trăng',C:'Tết Thiếu Nhi',D:'Tết Trung Thu'},correctAnswer:'C',explanation:'Đây là câu dễ gây nhầm vì Trung Thu thường được gọi vui là “Tết thiếu nhi”, nhưng “Tết Thiếu nhi” chính thức ở Việt Nam là ngày 1/6, không phải tên gọi chính thức của Trung Thu.'},
+  {points:200,question:'Trong các tên gọi dưới đây, cái nào “không cùng họ” với ba cái còn lại?',options:{A:'Hằng Nga',B:'Chú Cuội',C:'Chị Hằng',D:'Cây đa'},correctAnswer:'D',explanation:'Hằng Nga và Chị Hằng cùng chỉ một nhân vật trong truyền thuyết; Chú Cuội cũng là nhân vật gắn với câu chuyện Trung Thu. Cây đa là địa điểm/hình ảnh gắn với truyền thuyết Chú Cuội, không phải tên một nhân vật.'},
+  {points:200,question:'Theo tư liệu của Bảo tàng Lịch sử Quốc gia, dưới triều vua nào Trung Thu từng được tổ chức thành một lễ hội lớn tại kinh thành Thăng Long, với các hoạt động như yến tiệc, đua thuyền và biểu diễn rối nước?',options:{A:'Lý Thái Tổ',B:'Lý Nhân Tông',C:'Trần Nhân Tông',D:'Lê Thánh Tông'},correctAnswer:'B',explanation:'Bảo tàng Lịch sử Quốc gia ghi nhận từ thời Lý, dưới vua Lý Nhân Tông, triều đình tổ chức hội Trung Thu trong nhiều ngày.'},
+  {points:300,question:'Một trong những điểm khác biệt đáng chú ý của Trung Thu Việt Nam hiện đại so với hình dung phổ biến về Trung Thu ở Trung Hoa là gì?',options:{A:'Người Việt không sử dụng bánh Trung Thu',B:'Trung Thu Việt Nam gắn rất mạnh với trẻ em, rước đèn và múa lân',C:'Người Việt không có tục thưởng trăng',D:'Trung Thu Việt Nam luôn được tổ chức vào tháng 9 dương lịch'},correctAnswer:'B',explanation:'Trung Thu Việt Nam hiện nay gắn với trẻ em, rước đèn, đánh trống, múa lân và phá cỗ.'},
+  {points:400,question:'Điểm khác biệt nào dưới đây là chính xác khi so sánh Trung Thu Việt Nam với một lễ hội đèn lồng nổi tiếng của Hàn Quốc?',options:{A:'Trung Thu Việt Nam dùng đèn lồng, còn Hàn Quốc hoàn toàn không có văn hóa đèn lồng',B:'Trung Thu Việt Nam chủ yếu diễn ra vào tháng 8 âm lịch, trong khi Yeondeunghoe của Hàn Quốc gắn với ngày Phật Đản vào tháng 4 âm lịch',C:'Cả hai đều bắt buộc diễn ra vào Rằm tháng 8 âm lịch',D:'Yeondeunghoe của Hàn Quốc là một lễ hội Trung Thu'},correctAnswer:'B',explanation:'Yeondeunghoe là lễ hội thắp đèn của Hàn Quốc gắn với ngày Phật Đản, diễn ra vào ngày 8 tháng 4 âm lịch, không phải Trung Thu.'},
+  {points:500,question:'Trong nghề làm đèn lồng truyền thống của người Hoa ở Chợ Lớn, bộ phận nào thường được tạo trước và đóng vai trò tạo hình cho toàn bộ chiếc đèn?',options:{A:'Giấy kiếng',B:'Nến',C:'Khung',D:'Dây treo'},correctAnswer:'C',explanation:'Công đoạn đầu tiên là làm khung, thường bằng tre, gỗ mỏng hoặc kẽm, sau đó mới hoàn thiện các phần khác.'},
+  {points:600,question:'Một người nói: ‘Trung Thu Việt Nam có nguồn gốc hoàn toàn từ Trung Quốc nên tất cả các phong tục Trung Thu của Việt Nam đều là phong tục Trung Quốc.’ Nhận định nào sau đây phù hợp nhất với cách nhìn nghiên cứu văn hóa?',options:{A:'Đúng, vì Trung Thu là lễ hội của Trung Quốc',B:'Đúng, vì Việt Nam chỉ tiếp nhận nguyên bản Trung Thu từ Trung Quốc',C:'Không thể kết luận như vậy; Trung Thu Việt Nam có quá trình tiếp biến và mang những thực hành, ý nghĩa riêng trong bối cảnh văn hóa Việt',D:'Sai hoàn toàn, vì Trung Thu chỉ có nguồn gốc bản địa Việt Nam'},correctAnswer:'C',explanation:'Câu hỏi kiểm tra khả năng phân biệt ‘nguồn gốc/ảnh hưởng văn hóa’ với ‘bản sắc của một thực hành khi được tiếp biến’.'},
+  {points:800,question:'Trong lễ hội ngắm trăng Tsukimi của Nhật Bản, món ăn nào dưới đây thường được dùng để tượng trưng cho mặt trăng và mùa màng?',options:{A:'Mochi',B:'Tsukimi dango',C:'Dorayaki',D:'Taiyaki'},correctAnswer:'B',explanation:'Tsukimi (月見), nghĩa là ‘ngắm trăng’, là phong tục ngắm trăng mùa thu của Nhật Bản. Tsukimi dango là những viên bánh dango trắng, tròn, thường được bày trong dịp này cùng cỏ susuki và các lễ vật mùa thu.'},
+  {points:1000,question:'Ở Hàn Quốc, Tết Chuseok cũng diễn ra vào ngày 15 tháng 8 âm lịch. Nhưng thay vì bánh Trung Thu như ở Việt Nam, món bánh truyền thống đặc trưng của Chuseok là gì?',options:{A:'Tteokbokki',B:'Songpyeon',C:'Mandu',D:'Hotteok'},correctAnswer:'B',explanation:'Chuseok là một trong những ngày lễ truyền thống lớn của Hàn Quốc, diễn ra vào ngày 15 tháng 8 âm lịch. Songpyeon là loại bánh gạo truyền thống đặc trưng của dịp này, thường có hình bán nguyệt, được làm từ bột gạo và nhân như đậu, mè.'}
+];
+const backupBase={question:'Trong dịp Trung Thu ở Đài Loan, hoạt động nào dưới đây trở thành một nét văn hóa hiện đại rất đặc trưng, dù không phải phong tục Trung Thu truyền thống lâu đời?',options:{A:'Ăn bánh dứa',B:'Ăn thịt nướng ngoài trời cùng gia đình',C:'Rước đèn ông sao',D:'Thả đèn trời cầu nguyện'},correctAnswer:'B',explanation:'Từ cuối thế kỷ 20, việc nướng thịt ngoài trời (barbecue) trong dịp Trung Thu đã trở thành một hoạt động phổ biến ở Đài Loan. Đây là một hiện tượng văn hóa hiện đại phát triển mạnh và trở thành một phần quen thuộc của kỳ nghỉ Trung Thu tại Đài Loan.'};
+
+/* ============================ LƯU TRỮ ============================ */
+const FB_ON = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
+const FB_BASE = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents`;
+const norm = s => (s||'').normalize('NFC').trim().replace(/\s+/g,' ').toLowerCase();
+const plain = s => norm(s).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d');
+const docIdOf = name => plain(name).replace(/[^a-z0-9]+/g,'-');
+
+function findPlayer(input){
+  const n = norm(input); if(!n) return null;
+  const exact = PLAYERS.find(p => norm(p) === n); if(exact) return exact;
+  const loose = PLAYERS.filter(p => plain(p) === plain(input));   // cho phép gõ không dấu
+  return loose.length === 1 ? loose[0] : null;
+}
+function toFields(o){const f={};for(const[k,v]of Object.entries(o)){if(v instanceof Date)f[k]={timestampValue:v.toISOString()};else if(typeof v==='number')f[k]={integerValue:String(Math.round(v))};else if(typeof v==='boolean')f[k]={booleanValue:v};else f[k]={stringValue:String(v)}}return{fields:f}}
+function fromFields(f){const o={};for(const[k,v]of Object.entries(f||{})){o[k]=v.stringValue??(v.integerValue!=null?Number(v.integerValue):v.timestampValue??v.booleanValue??null)}return o}
+function demoLoad(){try{return JSON.parse(localStorage.getItem('tt2026_demo')||'{}')}catch{return{}}}
+function demoSave(d){try{localStorage.setItem('tt2026_demo',JSON.stringify(d))}catch{}}
+
+const store = {
+  // Tạo bản ghi lượt chơi. Trả về 'ok' | 'used'. Lỗi mạng -> throw.
+  async claim(id, data){
+    if(!FB_ON){const d=demoLoad();if(d[id])return'used';d[id]={...data,startedAt:new Date().toISOString()};demoSave(d);return'ok'}
+    const r = await fetch(`${FB_BASE}/${COLLECTION}?documentId=${encodeURIComponent(id)}&key=${FIREBASE_CONFIG.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(toFields({...data,startedAt:new Date()}))});
+    if(r.status===409) return 'used';
+    if(!r.ok) throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,200));
+    return 'ok';
+  },
+  async update(id, data){
+    if(!FB_ON){const d=demoLoad();if(!d[id]||d[id].status==='done')return;d[id]={...d[id],...data};if(data.finishedAt instanceof Date)d[id].finishedAt=data.finishedAt.toISOString();demoSave(d);return}
+    const mask = Object.keys(data).map(k=>'updateMask.fieldPaths='+k).join('&');
+    const r = await fetch(`${FB_BASE}/${COLLECTION}/${encodeURIComponent(id)}?${mask}&currentDocument.exists=true&key=${FIREBASE_CONFIG.apiKey}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(toFields(data))});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+  },
+  async list(){
+    if(!FB_ON){return Object.entries(demoLoad()).map(([id,v])=>({id,...v}))}
+    let out=[],token='';
+    do{const r=await fetch(`${FB_BASE}/${COLLECTION}?pageSize=300&key=${FIREBASE_CONFIG.apiKey}${token?'&pageToken='+token:''}`);if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();(j.documents||[]).forEach(doc=>out.push({id:doc.name.split('/').pop(),...fromFields(doc.fields)}));token=j.nextPageToken||''}while(token);
+    return out;
+  }
+};
+
+/* ============================ GAME ============================ */
+let state, timerId=null, audioCtx=null, soundEnabled=true;
+const $=id=>document.getElementById(id);
+function resetState(){clearTimers();state={screen:state?.screen||'start',playerName:'',department:'',docId:'',currentQuestion:1,currentQuestionData:null,isBackupQuestion:false,score:0,totalMs:0,correctAnswers:0,wrongAnswers:0,timeRemaining:30,qStart:0,isAnswerLocked:false,used5050:false,usedSwitchQuestion:false,unlockedHelp:false,finishedAt:null,endReason:''}}
+function clearTimers(){if(timerId)clearInterval(timerId);timerId=null}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(name+'Screen').classList.add('active');state.screen=name;window.scrollTo(0,0)}
+function playTone(freq=440,duration=.08){if(!soundEnabled)return;try{audioCtx??=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=freq;g.gain.setValueAtTime(.05,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}}
+function formMsg(t){$('formMessage').textContent=t;$('formMessage').classList.remove('hidden')}
+
+async function startGame(){
+  const rawName=$('nameInput').value, dept=$('deptInput').value.trim().replace(/\s+/g,' ');
+  if(!rawName.trim()||!dept){formMsg('Vui lòng nhập đầy đủ Họ & Tên và Phòng ban.');return}
+  const name=findPlayer(rawName);
+  if(!name){formMsg('Họ tên không có trong danh sách người chơi. Vui lòng nhập đầy đủ họ tên (có dấu) như đã đăng ký.');return}
+  const id=docIdOf(name), btn=$('startButton');
+  btn.disabled=true;btn.textContent='ĐANG KIỂM TRA…';
+  try{
+    const res=await store.claim(id,{name,department:dept,status:'playing',score:0,correct:0,currentQuestion:1});
+    if(res==='used'){formMsg(`“${name}” đã tham gia chơi rồi. Mỗi người chỉ được chơi 1 lần duy nhất.`);return}
+  }catch(e){console.error(e);formMsg('Không kết nối được máy chủ để kiểm tra lượt chơi. Vui lòng kiểm tra mạng rồi thử lại.');return}
+  finally{btn.disabled=false;btn.textContent='▶ BẮT ĐẦU'}
+  resetState();state.playerName=name;state.department=dept;state.docId=id;
+  showScreen('quiz');loadQuestion();playTone(523,.12);
+}
+
+function loadQuestion(){
+  clearTimers();
+  if(!state.isBackupQuestion) state.currentQuestionData=quizQuestions[state.currentQuestion-1];
+  state.isAnswerLocked=false;renderQuiz();startTimer();
+}
+function startTimer(){
+  state.qStart=performance.now();state.timeRemaining=30;updateTimer();
+  timerId=setInterval(()=>{
+    const el=(performance.now()-state.qStart)/1000, rem=Math.max(0,Math.ceil(30-el));
+    if(rem!==state.timeRemaining){state.timeRemaining=rem;updateTimer();if(rem<=5&&rem>0)playTone(880,.05)}
+    if(el>=30)handleTimeout();
+  },100);
+}
+function renderQuiz(){
+  const q=state.currentQuestionData;
+  $('questionMetric').innerHTML=`CÂU <strong>${String(state.currentQuestion).padStart(2,'0')} / 10</strong>`;
+  $('questionTag').textContent=state.isBackupQuestion?'CÂU HỎI PHỤ (ĐỔI CÂU)':(state.currentQuestion>=9?'CÂU HỎI · VÒNG CHUNG KẾT':'CÂU HỎI');
+  $('scoreMetric').textContent=state.score.toLocaleString('vi-VN');$('playerMetric').textContent=state.playerName;$('questionText').textContent=q.question;
+  $('feedback').className='feedback hidden';$('feedback').textContent='';$('nextButton').classList.add('hidden');
+  $('soundButton').textContent=soundEnabled?'🔊':'🔇';renderProgress();renderLadder();
+  $('answers').innerHTML='';
+  Object.entries(q.options).forEach(([key,text])=>{const b=document.createElement('button');b.type='button';b.className='answer-btn';b.dataset.key=key;b.innerHTML=`<span class="answer-key">${key}</span>`;b.append(text);b.setAttribute('aria-label',`${key}. ${text}`);b.addEventListener('click',()=>selectAnswer(key));$('answers').appendChild(b)});
+  updateHelp();
+}
+function renderProgress(){$('progressDots').innerHTML=Array.from({length:10},(_,i)=>`<span class="dot ${i+1<state.currentQuestion?'done':i+1===state.currentQuestion?'current':''}"></span>`).join('')}
+function renderLadder(){const pts=[1000,800,600,500,400,300,200,200,100,100];$('ladderItems').innerHTML=pts.map((p,i)=>{const n=10-i;return`<div class="ladder-item ${n===state.currentQuestion?'active':''}"><span>${n}</span><span>${p.toLocaleString('vi-VN')}</span></div>`}).join('')}
+function updateTimer(){const m=$('timerMetric');$('timerValue').textContent=state.timeRemaining;m.classList.toggle('warn',state.timeRemaining<=10&&state.timeRemaining>5);m.classList.toggle('critical',state.timeRemaining<=5)}
+function canHelp(){return state.unlockedHelp&&state.currentQuestion>=4&&state.currentQuestion<=8&&!state.isAnswerLocked}
+function updateHelp(){
+  const enabled=canHelp(),final=state.currentQuestion>=9;
+  $('fiftyButton').disabled=!enabled||state.used5050;$('switchButton').disabled=!enabled||state.usedSwitchQuestion;
+  $('fiftyButton').textContent=state.used5050?'✓ 50:50 ĐÃ DÙNG':(enabled?'🌓 50:50':'🔒 50:50');
+  $('switchButton').textContent=state.usedSwitchQuestion?'✓ ĐỔI CÂU ĐÃ DÙNG':(enabled?'🔄 ĐỔI CÂU':'🔒 ĐỔI CÂU');
+  $('helpHint').textContent=final?'🔒 VÒNG CHUNG KẾT – Trợ giúp không còn khả dụng.':(!state.unlockedHelp?'Trả lời đúng câu 3 để mở khóa quyền trợ giúp.':'Quyền trợ giúp khả dụng từ câu 4 đến câu 8.');
+}
+function selectAnswer(key){
+  if(state.isAnswerLocked||anyModal())return;
+  state.isAnswerLocked=true;clearTimers();
+  state.totalMs+=Math.min(30000,performance.now()-state.qStart);
+  document.querySelectorAll('.answer-btn').forEach(b=>{b.disabled=true;if(b.dataset.key===key)b.classList.add('selected')});
+  updateHelp();$('feedback').className='feedback';$('feedback').textContent=`BẠN CHỌN: ${key}`;playTone(300,.06);
+  setTimeout(()=>processAnswer(key,false),1000);
+}
+function handleTimeout(){
+  if(state.isAnswerLocked)return;state.isAnswerLocked=true;clearTimers();
+  state.timeRemaining=0;updateTimer();state.totalMs+=30000;
+  document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);updateHelp();processAnswer('',true);
+}
+function processAnswer(key,timedOut){
+  const q=state.currentQuestionData,correct=key===q.correctAnswer,fb=$('feedback'),nb=$('nextButton');
+  document.querySelectorAll('.answer-btn').forEach(b=>{if(b.dataset.key===q.correctAnswer)b.classList.add('correct');if(!correct&&b.dataset.key===key)b.classList.add('wrong')});
+  fb.innerHTML='';const head=document.createElement('strong');
+  if(correct){
+    state.score+=q.points;state.correctAnswers++;$('scoreMetric').textContent=state.score.toLocaleString('vi-VN');
+    fb.className='feedback good';head.textContent=`✓ CHÍNH XÁC! +${q.points.toLocaleString('vi-VN')} ĐIỂM`;
+    if(state.currentQuestion===3&&!state.unlockedHelp)state.unlockedHelp=true;
+    nb.textContent=state.currentQuestion===10?'🏁 XEM KẾT QUẢ':'CÂU TIẾP THEO ▶';playTone(660,.15);
+    saveProgress();
+  }else{
+    state.wrongAnswers++;state.endReason=timedOut?'timeout':'wrong';
+    fb.className='feedback bad';head.textContent=timedOut?'⏰ HẾT GIỜ!':'✕ RẤT TIẾC!';
+    nb.textContent='🏁 XEM KẾT QUẢ';playTone(180,.25);
+  }
+  fb.append(head,document.createElement('br'),(correct?'':`Đáp án đúng là: ${q.correctAnswer}. `)+q.explanation);
+  nb.classList.remove('hidden');nb.focus();
+}
+function onNext(){
+  $('nextButton').classList.add('hidden');
+  const lastCorrect=$('feedback').classList.contains('good');
+  if(!lastCorrect||state.currentQuestion===10){if(lastCorrect)state.endReason='completed';finishGame();return}
+  if(state.currentQuestion===3){$('unlockModal').classList.add('show');$('unlockClose').focus();return}
+  advance();
+}
+function advance(){
+  state.currentQuestion++;state.isBackupQuestion=false;
+  if(state.currentQuestion===9){$('finalModal').classList.add('show');$('finalClose').focus();playTone(392,.3);return}
+  loadQuestion();
+}
+function useFifty(){
+  if(!canHelp()||state.used5050)return;state.used5050=true;
+  const q=state.currentQuestionData,wrong=Object.keys(q.options).filter(x=>x!==q.correctAnswer),keep=wrong[Math.floor(Math.random()*wrong.length)];
+  document.querySelectorAll('.answer-btn').forEach(b=>{if(b.dataset.key!==q.correctAnswer&&b.dataset.key!==keep){b.style.visibility='hidden';b.disabled=true}});
+  updateHelp();playTone(500,.1);   // timer KHÔNG reset
+}
+function useSwitch(){
+  if(!canHelp()||state.usedSwitchQuestion)return;
+  clearTimers();state.usedSwitchQuestion=true;state.isBackupQuestion=true;   // không cộng thời gian câu cũ
+  state.currentQuestionData={...backupBase,points:quizQuestions[state.currentQuestion-1].points};
+  loadQuestion();playTone(580,.12);
+}
+function anyModal(){return document.querySelector('.modal.show')!==null}
+function saveProgress(){store.update(state.docId,{score:state.score,correct:state.correctAnswers,currentQuestion:state.currentQuestion,totalTimeMs:state.totalMs}).catch(()=>{})}
+
+function finishGame(){
+  clearTimers();state.finishedAt=new Date();
+  showScreen('result');renderResult();saveResult();playTone(784,.3);
+}
+async function saveResult(){
+  const s=$('saveStatus');s.style.color='#cfc4a4';s.textContent='Đang lưu kết quả lên hệ thống…';
+  try{
+    await store.update(state.docId,{status:'done',score:state.score,correct:state.correctAnswers,wrong:state.wrongAnswers,currentQuestion:state.currentQuestion,totalTimeMs:state.totalMs,endReason:state.endReason,used5050:state.used5050,usedSwitch:state.usedSwitchQuestion,finishedAt:state.finishedAt});
+    s.style.color='#9ff0c6';s.textContent=FB_ON?'✓ Đã lưu kết quả lên hệ thống.':'✓ Đã lưu (chế độ thử – chỉ trên trình duyệt này).';
+  }catch(e){
+    console.error(e);s.style.color='#ffb3b8';s.innerHTML='⚠ Chưa lưu được kết quả (lỗi mạng). ';
+    const b=document.createElement('button');b.className='underline font-bold';b.textContent='Thử lưu lại';b.onclick=saveResult;s.append(b);
+  }
+}
+const fmtTime=ms=>{const s=Math.round(ms/1000);return`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`};
+const fmtTimePrecise=ms=>{const s=ms/1000;return`${String(Math.floor(s/60)).padStart(2,'0')}:${(s%60).toFixed(1).padStart(4,'0')}`};
+function renderResult(){
+  const perfect=state.correctAnswers===10,answered=state.correctAnswers+state.wrongAnswers,unanswered=Math.max(0,10-answered);
+  $('resultName').textContent=state.playerName;$('resultDepartment').textContent=state.department;
+  $('resultMessage').textContent=perfect?'🎉 XUẤT SẮC!':'Bạn đã hoàn thành thử thách!';
+  $('resultDescription').textContent=perfect?'Bạn đã chinh phục toàn bộ thử thách Trung Thu!':`Điểm số của bạn là: ${state.score.toLocaleString('vi-VN')} / 4.200`;
+  const avg=answered?state.totalMs/1000/answered:0;
+  $('resultGrid').innerHTML=[['🏆 ĐIỂM',`${state.score.toLocaleString('vi-VN')} / 4.200`],['✓ CÂU ĐÚNG',`${state.correctAnswers} / 10`],['✕ CÂU SAI',state.wrongAnswers],['— CHƯA HOÀN THÀNH',unanswered],['⏱ TỔNG THỜI GIAN',fmtTime(state.totalMs)],['⚡ THỜI GIAN TRUNG BÌNH / CÂU',`${avg.toLocaleString('vi-VN',{minimumFractionDigits:1,maximumFractionDigits:1})} giây`]].map(x=>`<div class="result-stat">${x[0]}<strong>${x[1]}</strong></div>`).join('');
+  $('resultStamp').textContent=`Hoàn thành lúc ${state.finishedAt.toLocaleString('vi-VN')} · Thời gian chính xác ${fmtTimePrecise(state.totalMs)}`;
+}
+
+/* ============================ ADMIN ============================ */
+async function loadAdmin(){
+  $('adminInfo').textContent='Đang tải…';$('adminBody').innerHTML='';
+  try{
+    const rows=await store.list(),byId=Object.fromEntries(rows.map(r=>[r.id,r]));
+    const all=PLAYERS.map(n=>{const r=byId[docIdOf(n)];return r?{...r,name:n}:{name:n,status:'none'}});
+    const rank={done:0,playing:1,none:2};
+    all.sort((a,b)=>rank[a.status]-rank[b.status]||(b.score||0)-(a.score||0)||(a.totalTimeMs||0)-(b.totalTimeMs||0));
+    let i=0;
+    $('adminBody').innerHTML=all.map(r=>{const st=r.status==='done'?'<span class="tag done">Đã chơi</span>':r.status==='playing'?'<span class="tag playing">Đang chơi / bỏ dở</span>':'<span class="tag none">Chưa chơi</span>';const has=r.status!=='none';return`<tr><td>${r.status==='done'?++i:''}</td><td>${esc(r.name)}</td><td class="hide-sm">${esc(r.department||'')}</td><td>${st}</td><td class="num">${has?(r.score||0).toLocaleString('vi-VN'):''}</td><td class="num">${has?(r.correct||0)+'/10':''}</td><td class="num">${has&&r.totalTimeMs!=null?fmtTimePrecise(r.totalTimeMs):''}</td></tr>`}).join('');
+    const done=all.filter(r=>r.status==='done').length;
+    $('adminInfo').textContent=`${done}/${PLAYERS.length} người đã chơi xong · cập nhật ${new Date().toLocaleTimeString('vi-VN')}${FB_ON?'':' · (chế độ thử)'}`;
+  }catch(e){console.error(e);$('adminInfo').textContent='⚠ Không tải được dữ liệu từ Firebase. Kiểm tra cấu hình và Rules.'}
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============================ EVENTS ============================ */
+$('startForm').addEventListener('submit',e=>{e.preventDefault();startGame()});
+['nameInput','deptInput'].forEach(id=>$(id).addEventListener('input',()=>$('formMessage').classList.add('hidden')));
+$('fiftyButton').addEventListener('click',useFifty);$('switchButton').addEventListener('click',useSwitch);
+$('nextButton').addEventListener('click',onNext);
+$('unlockClose').addEventListener('click',()=>{$('unlockModal').classList.remove('show');advance()});
+$('finalClose').addEventListener('click',()=>{$('finalModal').classList.remove('show');loadQuestion()});
+$('restartButton').addEventListener('click',()=>{resetState();$('nameInput').value='';$('deptInput').value='';$('formMessage').classList.add('hidden');showScreen('start');$('nameInput').focus()});
+$('soundButton').addEventListener('click',()=>{soundEnabled=!soundEnabled;$('soundButton').textContent=soundEnabled?'🔊':'🔇';if(soundEnabled)playTone(600,.08)});
+$('adminRefresh').addEventListener('click',loadAdmin);
+document.addEventListener('keydown',e=>{if(state.screen==='quiz'&&!state.isAnswerLocked&&!anyModal()){const k=e.key.toUpperCase();if(['A','B','C','D'].includes(k)){const b=document.querySelector(`.answer-btn[data-key="${k}"]`);if(b&&!b.disabled&&b.style.visibility!=='hidden')b.click()}}});
+window.addEventListener('beforeunload',e=>{if(state.screen==='quiz'){e.preventDefault();e.returnValue=''}});
+
+resetState();
+if(!FB_ON)$('demoWarn').hidden=false;
+if(new URLSearchParams(location.search).has('admin')){showScreen('admin');loadAdmin()}
+</script>
+</body>
+</html>
