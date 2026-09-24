@@ -76,7 +76,8 @@
           </div>
           <p id="formMessage" class="hidden text-sm text-red-200" role="alert"></p>
           <button id="startButton" class="game-btn w-full py-4 mt-2" type="submit">▶ BẮT ĐẦU</button>
-          <p class="text-xs text-center" style="color:#cfc4a4">Mỗi người chỉ được chơi <b>01 lần</b>. Khi bấm BẮT ĐẦU, lượt chơi của bạn được ghi nhận.</p>
+          <p id="windowNote" class="text-sm text-center font-bold" style="color:#f3d66c"></p>
+          <p class="text-xs text-center" style="color:#cfc4a4">Mỗi người chỉ được chơi <b>01 lần</b>, mỗi câu có <b>60 giây</b>. Khi bấm BẮT ĐẦU, lượt chơi của bạn được ghi nhận.</p>
         </form>
       </div>
     </section>
@@ -88,7 +89,7 @@
           <header class="quiz-header panel">
             <div class="metric" id="questionMetric">CÂU <strong>01 / 10</strong></div>
             <div class="metric">🏆 ĐIỂM: <strong id="scoreMetric">0</strong></div>
-            <div id="timerMetric" class="metric timer">⏱ <strong id="timerValue">30</strong></div>
+            <div id="timerMetric" class="metric timer">⏱ <strong id="timerValue">60</strong></div>
             <div class="metric max-w-[180px] truncate" id="playerMetric"></div>
             <button id="soundButton" class="sound-btn" type="button" aria-label="Bật hoặc tắt âm thanh">🔊</button>
           </header>
@@ -174,6 +175,11 @@ const FIREBASE_CONFIG = {
 };
 const COLLECTION = "trungthu_2026";
 
+/* KHUNG GIỜ CHƠI (giờ Việt Nam, UTC+7) & THỜI GIAN MỖI CÂU */
+const PLAY_START = new Date("2026-09-24T09:00:00+07:00");
+const PLAY_END   = new Date("2026-09-24T11:00:00+07:00");
+const QUESTION_SECONDS = 60;
+
 /* 2) DANH SÁCH NGƯỜI CHƠI HỢP LỆ */
 const PLAYERS = [
   "Lê Hồng Hà","Nguyễn Thị Tuyết Trinh","Nguyễn Hoàng Tuyết Khanh","La Thúy Huyền Trân",
@@ -222,6 +228,7 @@ const store = {
     if(!FB_ON){const d=demoLoad();if(d[id])return'used';d[id]={...data,startedAt:new Date().toISOString()};demoSave(d);return'ok'}
     const r = await fetch(`${FB_BASE}/${COLLECTION}?documentId=${encodeURIComponent(id)}&key=${FIREBASE_CONFIG.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(toFields({...data,startedAt:new Date()}))});
     if(r.status===409) return 'used';
+    if(r.status===403) return 'closed';
     if(!r.ok) throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,200));
     return 'ok';
   },
@@ -242,7 +249,9 @@ const store = {
 /* ============================ GAME ============================ */
 let state, timerId=null, audioCtx=null, soundEnabled=true;
 const $=id=>document.getElementById(id);
-function resetState(){clearTimers();state={screen:state?.screen||'start',playerName:'',department:'',docId:'',currentQuestion:1,currentQuestionData:null,isBackupQuestion:false,score:0,totalMs:0,correctAnswers:0,wrongAnswers:0,timeRemaining:30,qStart:0,isAnswerLocked:false,used5050:false,usedSwitchQuestion:false,unlockedHelp:false,finishedAt:null,endReason:''}}
+const vnFmt=(d,o)=>d.toLocaleString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',...o});
+const WINDOW_TEXT=`${vnFmt(PLAY_START,{hour:'2-digit',minute:'2-digit'})} đến ${vnFmt(PLAY_END,{hour:'2-digit',minute:'2-digit'})} ngày ${vnFmt(PLAY_START,{day:'2-digit',month:'2-digit',year:'numeric'})} (giờ Việt Nam)`;
+function resetState(){clearTimers();state={screen:state?.screen||'start',playerName:'',department:'',docId:'',currentQuestion:1,currentQuestionData:null,isBackupQuestion:false,score:0,totalMs:0,correctAnswers:0,wrongAnswers:0,timeRemaining:QUESTION_SECONDS,qStart:0,isAnswerLocked:false,used5050:false,usedSwitchQuestion:false,unlockedHelp:false,finishedAt:null,endReason:''}}
 function clearTimers(){if(timerId)clearInterval(timerId);timerId=null}
 function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(name+'Screen').classList.add('active');state.screen=name;window.scrollTo(0,0)}
 function playTone(freq=440,duration=.08){if(!soundEnabled)return;try{audioCtx??=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=freq;g.gain.setValueAtTime(.05,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}}
@@ -253,10 +262,14 @@ async function startGame(){
   if(!rawName.trim()||!dept){formMsg('Vui lòng nhập đầy đủ Họ & Tên và Phòng ban.');return}
   const name=findPlayer(rawName);
   if(!name){formMsg('Họ tên không có trong danh sách người chơi. Vui lòng nhập đầy đủ họ tên (có dấu) như đã đăng ký.');return}
+  const now=new Date();
+  if(now<PLAY_START){formMsg(`Chưa đến giờ chơi. Game mở từ ${WINDOW_TEXT}.`);return}
+  if(now>=PLAY_END){formMsg(`Đã hết giờ chơi. Game chỉ mở từ ${WINDOW_TEXT}.`);return}
   const id=docIdOf(name), btn=$('startButton');
   btn.disabled=true;btn.textContent='ĐANG KIỂM TRA…';
   try{
     const res=await store.claim(id,{name,department:dept,status:'playing',score:0,correct:0,currentQuestion:1});
+    if(res==='closed'){formMsg(`Ngoài khung giờ chơi (${WINDOW_TEXT}) hoặc hệ thống từ chối. Vui lòng liên hệ Ban tổ chức.`);return}
     if(res==='used'){formMsg(`“${name}” đã tham gia chơi rồi. Mỗi người chỉ được chơi 1 lần duy nhất.`);return}
   }catch(e){console.error(e);formMsg('Không kết nối được máy chủ để kiểm tra lượt chơi. Vui lòng kiểm tra mạng rồi thử lại.');return}
   finally{btn.disabled=false;btn.textContent='▶ BẮT ĐẦU'}
@@ -270,11 +283,11 @@ function loadQuestion(){
   state.isAnswerLocked=false;renderQuiz();startTimer();
 }
 function startTimer(){
-  state.qStart=performance.now();state.timeRemaining=30;updateTimer();
+  state.qStart=performance.now();state.timeRemaining=QUESTION_SECONDS;updateTimer();
   timerId=setInterval(()=>{
-    const el=(performance.now()-state.qStart)/1000, rem=Math.max(0,Math.ceil(30-el));
+    const el=(performance.now()-state.qStart)/1000, rem=Math.max(0,Math.ceil(QUESTION_SECONDS-el));
     if(rem!==state.timeRemaining){state.timeRemaining=rem;updateTimer();if(rem<=5&&rem>0)playTone(880,.05)}
-    if(el>=30)handleTimeout();
+    if(el>=QUESTION_SECONDS)handleTimeout();
   },100);
 }
 function renderQuiz(){
@@ -302,14 +315,14 @@ function updateHelp(){
 function selectAnswer(key){
   if(state.isAnswerLocked||anyModal())return;
   state.isAnswerLocked=true;clearTimers();
-  state.totalMs+=Math.min(30000,performance.now()-state.qStart);
+  state.totalMs+=Math.min(QUESTION_SECONDS*1000,performance.now()-state.qStart);
   document.querySelectorAll('.answer-btn').forEach(b=>{b.disabled=true;if(b.dataset.key===key)b.classList.add('selected')});
   updateHelp();$('feedback').className='feedback';$('feedback').textContent=`BẠN CHỌN: ${key}`;playTone(300,.06);
   setTimeout(()=>processAnswer(key,false),1000);
 }
 function handleTimeout(){
   if(state.isAnswerLocked)return;state.isAnswerLocked=true;clearTimers();
-  state.timeRemaining=0;updateTimer();state.totalMs+=30000;
+  state.timeRemaining=0;updateTimer();state.totalMs+=QUESTION_SECONDS*1000;
   document.querySelectorAll('.answer-btn').forEach(b=>b.disabled=true);updateHelp();processAnswer('',true);
 }
 function processAnswer(key,timedOut){
@@ -413,6 +426,7 @@ document.addEventListener('keydown',e=>{if(state.screen==='quiz'&&!state.isAnswe
 window.addEventListener('beforeunload',e=>{if(state.screen==='quiz'){e.preventDefault();e.returnValue=''}});
 
 resetState();
+$('windowNote').textContent='⏰ Thời gian chơi: '+WINDOW_TEXT;
 if(!FB_ON)$('demoWarn').hidden=false;
 if(new URLSearchParams(location.search).has('admin')){showScreen('admin');loadAdmin()}
 </script>
