@@ -135,7 +135,7 @@
       <div class="panel w-full max-w-5xl rounded-3xl p-6 sm:p-8" style="height:fit-content">
         <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
           <h1 id="adminTitle" class="serif gold-text text-2xl font-bold">🏆 BẢNG XẾP HẠNG – TRUNG THU</h1>
-          <button id="adminRefresh" class="game-btn px-5 py-2" type="button">↻ TẢI LẠI</button>
+          <div class="flex gap-2 flex-wrap"><button id="adminExport" class="game-btn px-5 py-2" type="button">⬇ XUẤT BÁO CÁO EXCEL</button><button id="adminRefresh" class="game-btn px-5 py-2" type="button">↻ TẢI LẠI</button></div>
         </div>
         <p id="adminInfo" class="text-sm mb-3" style="color:#cfc4a4"></p>
         <div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>#</th><th>HỌ TÊN</th><th class="hide-sm">PHÒNG BAN</th><th>TRẠNG THÁI</th><th class="num">ĐIỂM</th><th class="num">ĐÚNG</th><th class="num">THỜI GIAN</th></tr></thead><tbody id="adminBody"></tbody></table></div>
@@ -184,7 +184,7 @@ const QUESTION_SECONDS = 60;
 const PLAYERS = [
   "Lê Hồng Hà","Nguyễn Thị Tuyết Trinh","Nguyễn Hoàng Tuyết Khanh","La Thúy Huyền Trân",
   "Phan Thị Bích Phượng","Nguyễn Hoàng Vinh","Nguyễn Đăng Khoa","Nguyễn Ngọc Tường Vân",
-  "Bùi Thị Mai Hương","Hoàng Vĩnh Phúc","Võ Đại Lộc","Đặng Ngọc Lan","Phạm Ngọc Mỹ Yến",
+  "Bùi Thị Mai Hương","Hoàng Vĩnh Phúc","Võ Đại Lộc","Đặng Ngọc Lan",
   "Đỗ Thị Ngọc Liên","Phạm Thị Kiều Trinh","Phạm Thị Thảo Hương","Lê Đông Hồ",
   "Khoa Test"
 ];
@@ -410,6 +410,35 @@ async function loadAdmin(){
     $('adminInfo').textContent=`${done}/${PLAYERS.length} người đã chơi xong · cập nhật ${new Date().toLocaleTimeString('vi-VN')}${FB_ON?'':' · (chế độ thử)'}`;
   }catch(e){console.error(e);$('adminInfo').textContent='⚠ Không tải được dữ liệu từ Firebase. Kiểm tra cấu hình và Rules.'}
 }
+function vnDateTime(v){
+  if(!v)return'';const d=new Date(v);if(isNaN(d))return'';
+  const p=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Ho_Chi_Minh',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(d).map(x=>[x.type,x.value]));
+  return`${p.day}/${p.month}/${p.year} ${p.hour}:${p.minute}:${p.second}`;
+}
+function loadScript(src){return new Promise((ok,err)=>{const t=document.createElement('script');t.src=src;t.onload=ok;t.onerror=err;document.head.appendChild(t)})}
+async function exportReport(){
+  const btn=$('adminExport'),label=btn.textContent;btn.disabled=true;btn.textContent='ĐANG XUẤT…';
+  try{
+    const rows=(await store.list()).map(r=>({...r,name:r.name||PLAYERS.find(n=>docIdOf(n)===r.id)||r.id}));
+    rows.sort((a,b)=>(b.correct||0)-(a.correct||0)||(a.totalTimeMs??1e12)-(b.totalTimeMs??1e12));
+    const header=['STT','Họ tên','Số câu đúng','Thời gian bắt đầu','Thời gian kết thúc','Số giây trả lời tất cả'];
+    const data=rows.map((r,i)=>[i+1,r.name,r.correct||0,vnDateTime(r.startedAt),r.status==='done'?vnDateTime(r.finishedAt):'(chưa hoàn thành)',r.totalTimeMs!=null?Math.round(r.totalTimeMs/100)/10:'']);
+    const stamp=vnDateTime(new Date()).replace(/[\/: ]/g,m=>m===' '?'_':'-');
+    const fname=`BaoCao_TrungThu_${stamp}`;
+    try{
+      if(!window.XLSX)await loadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+      const ws=XLSX.utils.aoa_to_sheet([header,...data]);
+      ws['!cols']=[{wch:5},{wch:28},{wch:12},{wch:21},{wch:21},{wch:22}];
+      const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Bao cao');
+      XLSX.writeFile(wb,fname+'.xlsx');
+    }catch(e){ // dự phòng: CSV mở được bằng Excel
+      const csv='﻿'+[header,...data].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+      const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=fname+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    }
+    $('adminInfo').textContent=`✓ Đã xuất báo cáo ${rows.length} người chơi · ${vnDateTime(new Date())}`;
+  }catch(e){console.error(e);$('adminInfo').textContent='⚠ Không tải được dữ liệu từ Firebase để xuất báo cáo.'}
+  finally{btn.disabled=false;btn.textContent=label}
+}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ============================ EVENTS ============================ */
@@ -422,6 +451,7 @@ $('finalClose').addEventListener('click',()=>{$('finalModal').classList.remove('
 $('restartButton').addEventListener('click',()=>{resetState();$('nameInput').value='';$('deptInput').value='';$('formMessage').classList.add('hidden');showScreen('start');$('nameInput').focus()});
 $('soundButton').addEventListener('click',()=>{soundEnabled=!soundEnabled;$('soundButton').textContent=soundEnabled?'🔊':'🔇';if(soundEnabled)playTone(600,.08)});
 $('adminRefresh').addEventListener('click',loadAdmin);
+$('adminExport').addEventListener('click',exportReport);
 document.addEventListener('keydown',e=>{if(state.screen==='quiz'&&!state.isAnswerLocked&&!anyModal()){const k=e.key.toUpperCase();if(['A','B','C','D'].includes(k)){const b=document.querySelector(`.answer-btn[data-key="${k}"]`);if(b&&!b.disabled&&b.style.visibility!=='hidden')b.click()}}});
 window.addEventListener('beforeunload',e=>{if(state.screen==='quiz'){e.preventDefault();e.returnValue=''}});
 
